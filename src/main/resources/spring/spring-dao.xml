@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="  
+    http://www.springframework.org/schema/beans  
+    http://www.springframework.org/schema/beans/spring-beans-3.2.xsd  
+    http://www.springframework.org/schema/context  
+    http://www.springframework.org/schema/context/spring-context-3.2.xsd  
+    http://www.springframework.org/schema/mvc  
+    http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
+
+	<!-- 引入配置文件properties -->
+	<context:property-placeholder location="classpath:properties/*.properties" />
+
+	<!-- 配置数据源 -->
+	<!-- init-method="init" 的作用是当bean实例化后,初始化项目的一些依赖(比如 配置文件, 数据库连接等) -->
+	<!-- destroy-method="close" 的作用是当数据库连接不使用的时候，就把该连接重新放到数据池中，方便下次使用调用 -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+	<!-- 配置Mybatis的文件 ，mapperLocations配置**Mapper.xml文件位置，configLocation配置mybatis-config文件位置 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- 自动扫描mapping.xml文件 -->
+		<property name="mapperLocations" value="classpath:mapper/**/*.xml" />
+		<property name="configLocation" value="classpath:spring/mybatis-config.xml" />
+	</bean>
+
+	<!-- 自动扫描了所有的XxxxMapper.xml对应的mapper接口文件，这样就不用一个一个手动配置Mpper的映射了，只要Mapper接口类和Mapper映射文件对应起来就可以了。 -->
+	<!-- 注意,没有必要去指定SqlSessionFactory或SqlSessionTemplate, 因为MapperScannerConfigurer将会创建 
+		MapperFactoryBean，之后自动装配。 但是，如果你使用了一个以上的DataSource，那么自动装配可能会失效。 这种情况下,你可以使用 
+		sqlSessionFactoryBeanName或sqlSessionTemplateBeanName 属性来设置正确的 bean名称来使用。 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.lin.dao" />
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+	</bean>
+
+</beans>
