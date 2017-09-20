@@ -55,7 +55,6 @@ public class UserController {
 		} 
 		if(!StringUtils.isBlank(oldPayPassword) 
 				&& oldPayPassword.equals(userService.selectUserById(user.getId()).getPayPassword())) {
-			
 			return map;
 		} 
 		if (StringUtils.isBlank(newPayPassword) || StringUtils.isBlank(truePayPassword)) {
